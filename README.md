@@ -1,5 +1,9 @@
+# Uniswap V2 Upgrade
 
-# INFO7500 Final Project: Upgrade UniswapV2
+<strong> Milestone: </strong> INFO 7500 - Final Project </br>
+<strong> Developer - </strong> SaiMahith Chigurupati </br>
+<strong> NUID - </strong> 002700539 </br>
+<strong> Email - </strong> chigurupati.sa@northeastern.edu
 
 1. UniswapV2 was written three years ago and uses outdated versions of Solidity tools
 2. Project goals:
@@ -9,7 +13,6 @@
 4. Read through the UniswapV2 code:
    https://github.com/Uniswap/v2-core
    https://github.com/Uniswap/v2-periphery
-   Class Notes (written by Jichu Wang, a former student at NEU).
 5. Copy the UniswapV2 code into a new Foundry project
    - The original code had the core and periphery contracts in different repos. We recommend combining them into a single repo to simplify development, and copying libraries rather than using package management.
    - UniswapV2Router01 should not be included.
