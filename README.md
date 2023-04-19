@@ -5,6 +5,8 @@
 <strong> NUID - </strong> 002700539 </br>
 <strong> Email - </strong> chigurupati.sa@northeastern.edu
 
+<strong> Tools used:</strong> Foundry, Solidity
+
 1. UniswapV2 was written three years ago and uses outdated versions of Solidity tools
 2. Project goals:
    - Achieve deep knowledge of the UniswapV2 implementation
