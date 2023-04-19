@@ -19,3 +19,7 @@
    - UniswapV2Pair
    - UniswapV2Factory
 8. Generate and commit a line coverage report to assess the quality of your tests
+
+## Coverage Report:
+
+<img width="846" alt="Uniswap V2 Coverage Report" src="https://user-images.githubusercontent.com/62823527/232962588-58b36dd1-7614-4899-bb64-adee21fca84c.png">
