@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
+
 import "../src/UniswapV2Factory.sol";
 import "../src/UniswapV2Pair.sol";
 import "../src/UniswapV2Router.sol";
@@ -36,23 +37,6 @@ contract UniswapV2RouterTest is Test {
         encoded = abi.encodeWithSignature(error);
     }
 
-//    function testAddLiquidityCreatesPair() public {
-//        tokenA.approve(address(router), 1 ether);
-//        tokenB.approve(address(router), 1 ether);
-//
-//        router.addLiquidity(
-//            address(tokenA),
-//            address(tokenB),
-//            1 ether,
-//            1 ether,
-//            1 ether,
-//            1 ether,
-//            address(this)
-//        );
-//
-//        address pairAddress = factory.pairs(address(tokenA), address(tokenB));
-//        assertEq(pairAddress, 0x28D60B002aE759608479991e780DD542C929539D);
-//    }
 
     function testAddLiquidityNoPair() public {
         tokenA.approve(address(router), 1 ether);
@@ -390,7 +374,6 @@ contract UniswapV2RouterTest is Test {
             address(this)
         );
 
-        // Swap 0.3 TKNA for ~0.186 TKNB
         assertEq(
             tokenA.balanceOf(address(this)),
             20 ether - 1 ether - 0.3 ether
@@ -440,7 +423,6 @@ contract UniswapV2RouterTest is Test {
             address(this)
         );
 
-        // Swap 0.3 TKNA for ~0.186 TKNB
         assertEq(
             tokenA.balanceOf(address(this)),
             20 ether - 1 ether - 0.3 ether

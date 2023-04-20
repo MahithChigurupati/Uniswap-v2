@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.19;
 
 import "solmate/tokens/ERC20.sol";
+
+import "./interfaces/IUniswapV2Callee.sol";
+
 import "./libraries/Math.sol";
 import "./libraries/UQ112x112.sol";
-import "./interfaces/IUniswapV2Callee.sol";
 
 interface IERC20 {
     function balanceOf(address) external returns (uint256);
@@ -57,9 +59,7 @@ contract UniswapV2Pair is ERC20, Math {
     modifier nonReentrant() {
         require(!isEntered);
         isEntered = true;
-
         _;
-
         isEntered = false;
     }
 
@@ -68,7 +68,6 @@ contract UniswapV2Pair is ERC20, Math {
     function initialize(address token0_, address token1_) public {
         if (token0 != address(0) || token1 != address(0))
             revert AlreadyInitialized();
-
         token0 = token0_;
         token1 = token1_;
     }
@@ -91,11 +90,8 @@ contract UniswapV2Pair is ERC20, Math {
         }
 
         if (liquidity <= 0) revert InsufficientLiquidityMinted();
-
         _mint(to, liquidity);
-
         _update(balance0, balance1, reserve0_, reserve1_);
-
         emit Mint(to, amount0, amount1);
     }
 
@@ -162,7 +158,6 @@ contract UniswapV2Pair is ERC20, Math {
 
         if (amount0In == 0 && amount1In == 0) revert InsufficientInputAmount();
 
-        // Adjusted = balance before swap - swap fee; fee stays in the contract
         uint256 balance0Adjusted = (balance0 * 1000) - (amount0In * 3);
         uint256 balance1Adjusted = (balance1 * 1000) - (amount1In * 3);
 

@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
-import "../src/UniswapV2Factory.sol";
-import "../src/UniswapV2Pair.sol";
+
 import "../src/libraries/UQ112x112.sol";
 import "./mocks/ERC20Mintable.sol";
+
+import "../src/UniswapV2Factory.sol";
+import "../src/UniswapV2Pair.sol";
 
 contract UniswapV2PairTest is Test {
     ERC20Mintable token0;
@@ -108,14 +110,14 @@ contract UniswapV2PairTest is Test {
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
 
-        pair.mint(address(this)); // + 1 LP
+        pair.mint(address(this));
 
         vm.warp(37);
 
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 2 ether);
 
-        pair.mint(address(this)); // + 2 LP
+        pair.mint(address(this));
 
         assertEq(pair.balanceOf(address(this)), 3 ether - 1000);
         assertEq(pair.totalSupply(), 3 ether);
@@ -126,20 +128,19 @@ contract UniswapV2PairTest is Test {
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
 
-        pair.mint(address(this)); // + 1 LP
+        pair.mint(address(this));
         assertEq(pair.balanceOf(address(this)), 1 ether - 1000);
         assertReserves(1 ether, 1 ether);
 
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 1 ether);
 
-        pair.mint(address(this)); // + 1 LP
+        pair.mint(address(this));
         assertEq(pair.balanceOf(address(this)), 2 ether - 1000);
         assertReserves(3 ether, 2 ether);
     }
 
     function testMintLiquidityUnderflow() public {
-        // 0x11: If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
         vm.expectRevert(encodeError("Panic(uint256)", 0x11));
         pair.mint(address(this));
     }
@@ -178,7 +179,7 @@ contract UniswapV2PairTest is Test {
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 1 ether);
 
-        pair.mint(address(this)); // + 1 LP
+        pair.mint(address(this));
 
         uint256 liquidity = pair.balanceOf(address(this));
         pair.transfer(address(pair), liquidity);
@@ -207,13 +208,12 @@ contract UniswapV2PairTest is Test {
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 1 ether);
 
-        pair.mint(address(this)); // + 1 LP
+        pair.mint(address(this));
 
         uint256 liquidity = pair.balanceOf(address(this));
         pair.transfer(address(pair), liquidity);
         pair.burn(address(this));
 
-        // this user is penalized for providing unbalanced liquidity
         assertEq(pair.balanceOf(address(this)), 0);
         assertReserves(1.5 ether, 1 ether);
         assertEq(pair.totalSupply(), 1 ether);
@@ -222,7 +222,6 @@ contract UniswapV2PairTest is Test {
 
         testUser.removeLiquidity(address(pair));
 
-        // testUser receives the amount collected from this user
         assertEq(pair.balanceOf(address(testUser)), 0);
         assertReserves(1500, 1000);
         assertEq(pair.totalSupply(), 1000);
@@ -234,13 +233,11 @@ contract UniswapV2PairTest is Test {
     }
 
     function testBurnZeroTotalSupply() public {
-        // 0x12; If you divide or modulo by zero.
         vm.expectRevert(encodeError("Panic(uint256)", 0x12));
         pair.burn(address(this));
     }
 
     function testBurnZeroLiquidity() public {
-        // Transfer and mint as a normal user.
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
         pair.mint(address(this));
@@ -414,39 +411,32 @@ contract UniswapV2PairTest is Test {
             uint256 initialPrice1
         ) = calculateCurrentPrice();
 
-        // 0 seconds passed.
         pair.sync();
         assertCumulativePrices(0, 0);
 
-        // 1 second passed.
         vm.warp(1);
         pair.sync();
         assertBlockTimestampLast(1);
         assertCumulativePrices(initialPrice0, initialPrice1);
 
-        // 2 seconds passed.
         vm.warp(2);
         pair.sync();
         assertBlockTimestampLast(2);
         assertCumulativePrices(initialPrice0 * 2, initialPrice1 * 2);
 
-        // 3 seconds passed.
         vm.warp(3);
         pair.sync();
         assertBlockTimestampLast(3);
         assertCumulativePrices(initialPrice0 * 3, initialPrice1 * 3);
 
-        // // Price changed.
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 1 ether);
         pair.mint(address(this));
 
         (uint256 newPrice0, uint256 newPrice1) = calculateCurrentPrice();
 
-        // // 0 seconds since last reserves update.
         assertCumulativePrices(initialPrice0 * 3, initialPrice1 * 3);
 
-        // // 1 second passed.
         vm.warp(4);
         pair.sync();
         assertBlockTimestampLast(4);
@@ -455,7 +445,6 @@ contract UniswapV2PairTest is Test {
             initialPrice1 * 3 + newPrice1
         );
 
-        // 2 seconds passed.
         vm.warp(5);
         pair.sync();
         assertBlockTimestampLast(5);
@@ -464,7 +453,6 @@ contract UniswapV2PairTest is Test {
             initialPrice1 * 3 + newPrice1 * 2
         );
 
-        // 3 seconds passed.
         vm.warp(6);
         pair.sync();
         assertBlockTimestampLast(6);
@@ -473,27 +461,6 @@ contract UniswapV2PairTest is Test {
             initialPrice1 * 3 + newPrice1 * 3
         );
     }
-
-//    function testFlashloan() public {
-//        token0.transfer(address(pair), 1 ether);
-//        token1.transfer(address(pair), 2 ether);
-//        pair.mint(address(this));
-//
-//        uint256 flashloanAmount = 0.1 ether;
-//        uint256 flashloanFee = (flashloanAmount * 1000) /
-//            997 -
-//            flashloanAmount +
-//            1;
-//
-//        Flashloaner fl = new Flashloaner();
-//
-//        token1.transfer(address(fl), flashloanFee);
-//
-//        fl.flashloan(address(pair), 0, flashloanAmount, address(token1));
-//
-//        assertEq(token1.balanceOf(address(fl)), 0);
-//        assertEq(token1.balanceOf(address(pair)), 2 ether + flashloanFee);
-//    }
 }
 
 contract TestUser {
@@ -543,17 +510,4 @@ contract Flashloaner {
         );
     }
 
-//    function UniswapV2Call(
-//        address sender,
-//        uint256 amount0Out,
-//        uint256 amount1Out,
-//        bytes calldata data
-//    ) public {
-//        address tokenAddress = abi.decode(data, (address));
-//        uint256 balance = ERC20(tokenAddress).balanceOf(address(this));
-//
-//        if (balance < expectedLoanAmount) revert InsufficientFlashLoanAmount();
-//
-//        ERC20(tokenAddress).transfer(msg.sender, balance);
-//    }
 }
