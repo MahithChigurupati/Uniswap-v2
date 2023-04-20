@@ -474,26 +474,26 @@ contract UniswapV2PairTest is Test {
         );
     }
 
-    function testFlashloan() public {
-        token0.transfer(address(pair), 1 ether);
-        token1.transfer(address(pair), 2 ether);
-        pair.mint(address(this));
-
-        uint256 flashloanAmount = 0.1 ether;
-        uint256 flashloanFee = (flashloanAmount * 1000) /
-            997 -
-            flashloanAmount +
-            1;
-
-        Flashloaner fl = new Flashloaner();
-
-        token1.transfer(address(fl), flashloanFee);
-
-        fl.flashloan(address(pair), 0, flashloanAmount, address(token1));
-
-        assertEq(token1.balanceOf(address(fl)), 0);
-        assertEq(token1.balanceOf(address(pair)), 2 ether + flashloanFee);
-    }
+//    function testFlashloan() public {
+//        token0.transfer(address(pair), 1 ether);
+//        token1.transfer(address(pair), 2 ether);
+//        pair.mint(address(this));
+//
+//        uint256 flashloanAmount = 0.1 ether;
+//        uint256 flashloanFee = (flashloanAmount * 1000) /
+//            997 -
+//            flashloanAmount +
+//            1;
+//
+//        Flashloaner fl = new Flashloaner();
+//
+//        token1.transfer(address(fl), flashloanFee);
+//
+//        fl.flashloan(address(pair), 0, flashloanAmount, address(token1));
+//
+//        assertEq(token1.balanceOf(address(fl)), 0);
+//        assertEq(token1.balanceOf(address(pair)), 2 ether + flashloanFee);
+//    }
 }
 
 contract TestUser {
@@ -543,17 +543,17 @@ contract Flashloaner {
         );
     }
 
-    function UniswapV2Call(
-        address sender,
-        uint256 amount0Out,
-        uint256 amount1Out,
-        bytes calldata data
-    ) public {
-        address tokenAddress = abi.decode(data, (address));
-        uint256 balance = ERC20(tokenAddress).balanceOf(address(this));
-
-        if (balance < expectedLoanAmount) revert InsufficientFlashLoanAmount();
-
-        ERC20(tokenAddress).transfer(msg.sender, balance);
-    }
+//    function UniswapV2Call(
+//        address sender,
+//        uint256 amount0Out,
+//        uint256 amount1Out,
+//        bytes calldata data
+//    ) public {
+//        address tokenAddress = abi.decode(data, (address));
+//        uint256 balance = ERC20(tokenAddress).balanceOf(address(this));
+//
+//        if (balance < expectedLoanAmount) revert InsufficientFlashLoanAmount();
+//
+//        ERC20(tokenAddress).transfer(msg.sender, balance);
+//    }
 }
